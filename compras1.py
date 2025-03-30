@@ -787,6 +787,7 @@ def editar_formulario(formulario: FormularioCompra):
     with st.form(f"editar_form_{formulario.id}"):
         col1, col2 = st.columns(2)
         with col1:
+            novo_solicitante = st.text_input("Solicitante*
             novo_solicitante = st.text_input("Solicitante*", value=formulario.solicitante, max_chars=100)
             novo_centro_custo = st.text_input("Centro de Custo*", value=formulario.centro_custo, max_chars=50)
             novo_local_entrega = st.text_input("Local de Entrega*", value=formulario.local_entrega, max_chars=100)
@@ -956,6 +957,9 @@ def confirmar_exclusao(formulario: FormularioCompra):
 def configuracao():
     st.header("⚙️ Configurações")
     
+    # Declarações globais no início da função
+    global GITHUB_REPO, GITHUB_FILEPATH, GITHUB_TOKEN, MAX_BACKUPS
+    
     # Verificação de senha
     if 'autenticado' not in st.session_state:
         st.session_state.autenticado = False
@@ -968,8 +972,6 @@ def configuracao():
         elif senha:
             st.error("Senha incorreta!")
         return
-    
-    global GITHUB_REPO, GITHUB_FILEPATH, GITHUB_TOKEN
     
     st.success("🔓 Acesso autorizado às configurações")
     
@@ -1097,7 +1099,6 @@ def configuracao():
                     st.success("Senha atualizada com sucesso!")
                 
                 # Atualizar configurações de backup
-                global MAX_BACKUPS
                 MAX_BACKUPS = limite_backups
                 st.success("Configurações salvas!")
 
