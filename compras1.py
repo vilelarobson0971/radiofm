@@ -2,15 +2,15 @@ import streamlit as st
 import time
 import numpy as np
 import matplotlib.pyplot as plt
-from audio_processing import get_audio_levels  # Esta é uma função fictícia para demonstração
 
 # Configuração da página
 st.set_page_config(page_title="Rádio Transamérica", page_icon="🎵")
 
 def generate_vu_meter(level):
-    """Gera uma barra VU dinâmica"""
+    """Gera uma barra VU dinâmica simulada"""
     fig, ax = plt.subplots(figsize=(10, 2))
-    ax.barh(0, level, color='green', height=0.5)
+    color = 'green' if level < 70 else 'yellow' if level < 90 else 'red'
+    ax.barh(0, level, color=color, height=0.5)
     ax.set_xlim(0, 100)
     ax.set_xticks([])
     ax.set_yticks([])
@@ -38,12 +38,10 @@ def main():
     if st.button("▶️ Reproduzir Rádio"):
         audio_placeholder.audio(stream_url, format='audio/aac')
         st.success("Rádio em reprodução!")
-    
-    # Simulação da barra VU
-    if audio_placeholder._is_top_level:
-        for i in range(100):
-            # Em um app real, você usaria get_audio_levels() para obter níveis reais
-            level = np.random.randint(30, 95)  # Simulação aleatória
+        
+        # Simulação da barra VU (apenas visual)
+        for _ in range(100):  # Atualiza por 10 segundos (100 iterações)
+            level = np.random.randint(30, 95)  # Valor aleatório para simulação
             vu_fig = generate_vu_meter(level)
             vu_placeholder.pyplot(vu_fig)
             time.sleep(0.1)
