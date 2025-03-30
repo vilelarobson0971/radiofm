@@ -1,2 +1,3 @@
-streamlit==1.32.0
-python-vlc==3.0.20123
+streamlit>=1.32.0
+matplotlib>=3.7.0
+numpy>=1.24.0
