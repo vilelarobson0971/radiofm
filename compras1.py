@@ -785,18 +785,18 @@ def editar_formulario(formulario: FormularioCompra):
     form_index = df[df['ID'] == formulario.id].index[0]
     
     with st.form(f"editar_form_{formulario.id}"):
-        col1, col2 = st.columns(2)
-        with col1:
-            novo_solicitante = st.text_input("Solicitante*
-            novo_solicitante = st.text_input("Solicitante*", value=formulario.solicitante, max_chars=100)
-            novo_centro_custo = st.text_input("Centro de Custo*", value=formulario.centro_custo, max_chars=50)
-            novo_local_entrega = st.text_input("Local de Entrega*", value=formulario.local_entrega, max_chars=100)
-        with col2:
-            novo_aprovador = st.text_input("Aprovador*", value=formulario.aprovador, max_chars=100)
-            novo_comprador = st.text_input("Comprador", value=formulario.comprador, max_chars=100)
-        
-        nova_justificativa = st.text_area("Justificativa*", value=formulario.justificativa, max_chars=500)
-        
+            col1, col2 = st.columns(2)
+            with col1:
+                novo_solicitante = st.text_input("Solicitante*", value=formulario.solicitante, max_chars=100)
+                novo_centro_custo = st.text_input("Centro de Custo*", value=formulario.centro_custo, max_chars=50)
+                novo_local_entrega = st.text_input("Local de Entrega*", value=formulario.local_entrega, max_chars=100)
+            with col2:
+                novo_aprovador = st.text_input("Aprovador*", value=formulario.aprovador, max_chars=100)
+                novo_comprador = st.text_input("Comprador", value=formulario.comprador, max_chars=100)
+            
+            nova_justificativa = st.text_area("Justificativa*", value=formulario.justificativa, max_chars=500)
+
+    
         # Edição de itens
         st.subheader("Itens Solicitados")
         if 'itens_editados' not in st.session_state:
