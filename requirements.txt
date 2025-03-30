@@ -1,0 +1,4 @@
+streamlit==1.32.2
+pandas==2.1.4
+PyGithub==2.2.0
+python-dotenv==1.0.0  # Opcional para gerenciamento de variáveis de ambiente
