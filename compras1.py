@@ -786,7 +786,7 @@ def editar_formulario(formulario: FormularioCompra):
     
     with st.form(f"editar_form_{formulario.id}"):
         col1, col2 = st.columns(2)
-                with col1:
+        with col1:
             novo_solicitante = st.text_input("Solicitante*", value=formulario.solicitante, max_chars=100)
             novo_centro_custo = st.text_input("Centro de Custo*", value=formulario.centro_custo, max_chars=50)
             novo_local_entrega = st.text_input("Local de Entrega*", value=formulario.local_entrega, max_chars=100)
