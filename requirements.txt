@@ -1,4 +1,8 @@
-streamlit==1.32.2
+streamlit==1.32.0
 pandas==2.1.4
-PyGithub==2.2.0
-python-dotenv==1.0.0  # Opcional para gerenciamento de variáveis de ambiente
+python-dotenv==1.0.0
+PyGithub==2.1.1
+fpdf2==2.7.7
+python-dateutil==2.8.2
+numpy==1.26.3
+typing-extensions==4.9.0
