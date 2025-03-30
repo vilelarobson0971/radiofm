@@ -1,35 +1,38 @@
 import streamlit as st
-import requests
-from io import BytesIO
 import time
 
 def main():
-    st.title("Rádio Transamérica - Streamlit Player")
+    st.title("🎵 Rádio Transamérica - Player Online")
     
     # URL do streaming de áudio da rádio
     stream_url = "https://playerservices.streamtheworld.com/api/livestream-redirect/RT_SPAAC.aac"
     
-    # Usando o player de áudio nativo do Streamlit
-    st.audio(stream_url, format='audio/aac')
+    # Player de áudio
+    audio_placeholder = st.empty()
+    audio_placeholder.audio(stream_url, format='audio/aac')
     
-    # Controles adicionais
+    # Controles
     col1, col2 = st.columns(2)
     
     with col1:
-        if st.button("Reproduzir Rádio"):
-            st.experimental_rerun()  # Recarrega o player
+        if st.button("▶️ Reproduzir Rádio"):
+            audio_placeholder.audio(stream_url, format='audio/aac')
             
     with col2:
-        if st.button("Parar Rádio"):
-            st.experimental_rerun()  # Recarrega a página para "parar"
-
-    st.write("O player pode levar alguns segundos para começar a reprodução.")
+        if st.button("⏹️ Parar Rádio"):
+            audio_placeholder.empty()  # Remove o player
     
-    # Atualização automática para manter o stream ativo
-    st_autorefresh = st.empty()
-    st_autorefresh.info("Atualizando a cada 30 segundos...")
-    time.sleep(30)
-    st.experimental_rerun()
+    # Status e informações
+    if audio_placeholder._is_top_level:
+        st.success("Rádio carregada com sucesso!")
+    else:
+        st.warning("Clique em 'Reproduzir' para iniciar")
+    
+    # Atualização automática (opcional)
+    refresh = st.checkbox("Manter conexão ativa (atualizar a cada 30s)")
+    if refresh:
+        time.sleep(30)
+        st.rerun()  # Usando st.rerun() em vez de st.experimental_rerun()
 
 if __name__ == "__main__":
     main()
