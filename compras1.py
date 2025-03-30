@@ -798,20 +798,20 @@ def editar_formulario(formulario: FormularioCompra):
 
     
         # Edição de itens
-        st.subheader("Itens Solicitados")
-        if 'itens_editados' not in st.session_state:
-            st.session_state.itens_editados = list(zip(formulario.itens, formulario.quantidades))
-        
-        for idx, (item, qtd) in enumerate(st.session_state.itens_editados):
-            col1, col2, col3 = st.columns([4, 2, 1])
-            with col1:
-                novo_item = st.text_input(f"Item {idx+1}", value=item, key=f"item_{idx}")
-            with col2:
-                nova_qtd = st.text_input(f"Qtd {idx+1}", value=qtd, key=f"qtd_{idx}")
-            with col3:
-                if st.button("❌", key=f"remove_{idx}"):
-                    st.session_state.itens_editados.pop(idx)
-                    st.rerun()
+            st.subheader("Itens Solicitados")
+            if 'itens_editados' not in st.session_state:
+                st.session_state.itens_editados = list(zip(formulario.itens, formulario.quantidades))
+            
+            for idx, (item, qtd) in enumerate(st.session_state.itens_editados):
+                col1, col2, col3 = st.columns([4, 2, 1])
+                with col1:
+                    novo_item = st.text_input(f"Item {idx+1}", value=item, key=f"item_{idx}")
+                with col2:
+                    nova_qtd = st.text_input(f"Qtd {idx+1}", value=qtd, key=f"qtd_{idx}")
+                with col3:
+                    if st.button("❌", key=f"remove_{idx}"):
+                        st.session_state.itens_editados.pop(idx)
+                        st.rerun()
             
             # Atualiza os valores na lista
             if novo_item != item or nova_qtd != qtd:
