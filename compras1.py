@@ -17,10 +17,11 @@ st.set_page_config(
 # Constantes
 LOCAL_FILENAME = "formularios_compras.csv"
 CONFIG_FILE = "github_config.json"
+SENHA_CONFIG = "king@joe123"  # Senha para acessar configurações
 
 # Configurações padrão do GitHub
-DEFAULT_REPO = "seu_usuario/seu_repositorio"  # Substitua pelos seus dados
-DEFAULT_FILEPATH = "dados/formularios_compras.csv"
+DEFAULT_REPO = "vilelarobson0971/compras"
+DEFAULT_FILEPATH = "formularios_compras.csv"
 
 # Variáveis globais para configuração do GitHub
 GITHUB_REPO = None
@@ -109,18 +110,18 @@ def enviar_para_github():
 
 def carregar_dados():
     """Carrega os dados do CSV local com tratamento de erros"""
+    colunas_necessarias = [
+        "ID", "Status", "Data Solicitação", "Solicitante", "Centro Custo",
+        "Itens", "Quantidades", "Justificativa", "Local Entrega",
+        "Aprovador", "Comprador", "Fornecedores", "Preços Unitários",
+        "Preços Totais"
+    ]
+    
     try:
         if os.path.exists(LOCAL_FILENAME) and os.path.getsize(LOCAL_FILENAME) > 0:
             df = pd.read_csv(LOCAL_FILENAME)
             
             # Verifica se todas as colunas necessárias existem
-            colunas_necessarias = [
-                "ID", "Status", "Data Solicitação", "Solicitante", "Centro Custo",
-                "Itens", "Quantidades", "Justificativa", "Local Entrega",
-                "Aprovador", "Comprador", "Fornecedores", "Preços Unitários",
-                "Preços Totais"
-            ]
-            
             for coluna in colunas_necessarias:
                 if coluna not in df.columns:
                     df[coluna] = ""
@@ -178,7 +179,7 @@ def gerar_id(df):
         ultimo_id = 0
 
     novo_numero = ultimo_id + 1
-    return f"{novo_numero:04d}-{ano_atval}"
+    return f"{novo_numero:04d}-{ano_atual}"
 
 # Páginas do sistema
 def pagina_inicial():
@@ -189,7 +190,6 @@ def pagina_inicial():
     - 📝 **Novo Formulário** - Cadastro de novas solicitações de compra
     - 📋 **Completar Formulário** - Adicionar cotações e completar formulários pendentes
     - 🔍 **Buscar Formulários** - Consulta avançada de formulários cadastrados
-    - ⚙️ **Configurações** - Configurar sincronização com GitHub
     """)
 
     # Mostra status de sincronização com GitHub
@@ -404,16 +404,32 @@ def buscar_formularios():
 
 def configuracao():
     st.header("⚙️ Configurações")
+    
+    # Verificação de senha
+    if 'autenticado' not in st.session_state:
+        st.session_state.autenticado = False
+    
+    if not st.session_state.autenticado:
+        senha = st.text_input("Digite a senha de acesso:", type="password")
+        if senha == SENHA_CONFIG:
+            st.session_state.autenticado = True
+            st.rerun()
+        elif senha:  # Só mostra erro se o usuário tentou digitar algo
+            st.error("Senha incorreta!")
+        return
+    
     global GITHUB_REPO, GITHUB_FILEPATH, GITHUB_TOKEN
+    
+    st.success("Acesso autorizado às configurações")
     
     with st.form("github_config"):
         st.subheader("Configuração do GitHub")
         
         # Mostra configurações atuais
-        st.info(f"Repositório atual: {GITHUB_REPO or 'Não configurado'}")
-        st.info(f"Arquivo atual: {GITHUB_FILEPATH or 'Não configurado'}")
+        st.info(f"Repositório atual: {GITHUB_REPO or DEFAULT_REPO}")
+        st.info(f"Arquivo atual: {GITHUB_FILEPATH or DEFAULT_FILEPATH}")
         
-        # Campos de configuração (apenas token é editável)
+        # Campo para inserção do token
         token = st.text_input("Token de acesso GitHub*", type="password", value=GITHUB_TOKEN or "")
         
         submitted = st.form_submit_button("Salvar Configurações")
@@ -423,19 +439,22 @@ def configuracao():
                 try:
                     # Testa o token com as configurações existentes
                     g = Github(token)
+                    repo = g.get_repo(GITHUB_REPO if GITHUB_REPO else DEFAULT_REPO)
                     
-                    # Verifica se o repositório e arquivo existem
-                    if GITHUB_REPO and GITHUB_FILEPATH:
-                        try:
-                            repo = g.get_repo(GITHUB_REPO)
-                            repo.get_contents(GITHUB_FILEPATH)
-                        except:
-                            # Se não existir, cria o arquivo
-                            with open(LOCAL_FILENAME, 'r') as f:
-                                content = f.read()
-                            repo.create_file(GITHUB_FILEPATH, "Criação inicial", content)
+                    # Verifica se o arquivo existe ou tenta criar
+                    try:
+                        repo.get_contents(GITHUB_FILEPATH if GITHUB_FILEPATH else DEFAULT_FILEPATH)
+                    except:
+                        # Se não existir, cria o arquivo
+                        with open(LOCAL_FILENAME, 'r') as f:
+                            content = f.read()
+                        repo.create_file(
+                            GITHUB_FILEPATH if GITHUB_FILEPATH else DEFAULT_FILEPATH,
+                            "Criação inicial do arquivo de compras",
+                            content
+                        )
                     
-                    # Salva apenas o token (mantém repo e filepath padrão)
+                    # Salva as configurações
                     config = {
                         'github_repo': GITHUB_REPO if GITHUB_REPO else DEFAULT_REPO,
                         'github_filepath': GITHUB_FILEPATH if GITHUB_FILEPATH else DEFAULT_FILEPATH,
@@ -447,21 +466,19 @@ def configuracao():
                     
                     # Atualiza variáveis globais
                     GITHUB_TOKEN = token
-                    if not GITHUB_REPO:
-                        GITHUB_REPO = DEFAULT_REPO
-                    if not GITHUB_FILEPATH:
-                        GITHUB_FILEPATH = DEFAULT_FILEPATH
+                    GITHUB_REPO = GITHUB_REPO if GITHUB_REPO else DEFAULT_REPO
+                    GITHUB_FILEPATH = GITHUB_FILEPATH if GITHUB_FILEPATH else DEFAULT_FILEPATH
                     
-                    st.success("Token salvo e validado com sucesso!")
+                    st.success("Configurações salvas e validadas com sucesso!")
                     
-                    # Tenta sincronizar imediatamente
+                    # Sincroniza os dados
                     if baixar_do_github():
                         st.success("Dados sincronizados com o GitHub!")
                     else:
                         st.warning("Configurações salvas, mas não foi possível sincronizar")
                         
                 except Exception as e:
-                    st.error(f"Token inválido ou sem permissões: {str(e)}")
+                    st.error(f"Erro ao validar credenciais: {str(e)}")
             else:
                 st.error("Informe o token de acesso")
 
