@@ -9,22 +9,9 @@ def main():
     # URL do streaming
     stream_url = "https://playerservices.streamtheworld.com/api/livestream-redirect/RT_SPAAC.aac"
     
-    # Inicializa o estado do player
-    if 'playing' not in st.session_state:
-        st.session_state.playing = False
-    
-    # Player de áudio (sempre visível)
-    audio_placeholder = st.empty()
-    
-    # Único botão de controle
-    if st.button("▶️ Reproduzir Rádio" if not st.session_state.playing else "⏹️ Parar"):
-        st.session_state.playing = not st.session_state.playing
-        if st.session_state.playing:
-            audio_placeholder.audio(stream_url, format='audio/aac')
-            st.success("Rádio em reprodução!")
-        else:
-            audio_placeholder.empty()
-            st.warning("Reprodução parada")
+    # Player de áudio (inicia automaticamente)
+    st.audio(stream_url, format='audio/aac')
+    st.success("Rádio em reprodução automática!")
     
     # Rodapé
     st.markdown("---")
