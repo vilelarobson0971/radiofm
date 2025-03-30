@@ -18,6 +18,10 @@ st.set_page_config(
 LOCAL_FILENAME = "formularios_compras.csv"
 CONFIG_FILE = "github_config.json"
 
+# Configurações padrão do GitHub
+DEFAULT_REPO = "seu_usuario/seu_repositorio"  # Substitua pelos seus dados
+DEFAULT_FILEPATH = "dados/formularios_compras.csv"
+
 # Variáveis globais para configuração do GitHub
 GITHUB_REPO = None
 GITHUB_FILEPATH = None
@@ -31,8 +35,8 @@ def carregar_config():
         if os.path.exists(CONFIG_FILE):
             with open(CONFIG_FILE) as f:
                 config = json.load(f)
-                GITHUB_REPO = config.get('github_repo')
-                GITHUB_FILEPATH = config.get('github_filepath')
+                GITHUB_REPO = config.get('github_repo', DEFAULT_REPO)
+                GITHUB_FILEPATH = config.get('github_filepath', DEFAULT_FILEPATH)
                 GITHUB_TOKEN = config.get('github_token')
     except Exception as e:
         st.error(f"Erro ao carregar configurações: {str(e)}")
@@ -45,16 +49,21 @@ def inicializar_arquivos():
     # Inicializar arquivo de formulários de compras
     if not os.path.exists(LOCAL_FILENAME) or os.path.getsize(LOCAL_FILENAME) == 0:
         if GITHUB_REPO and GITHUB_FILEPATH and GITHUB_TOKEN:
-            baixar_do_github()
+            if not baixar_do_github():
+                criar_arquivo_local()
         else:
-            with open(LOCAL_FILENAME, mode='w', newline='', encoding='utf-8') as f:
-                writer = csv.writer(f)
-                writer.writerow([
-                    "ID", "Status", "Data Solicitação", "Solicitante", "Centro Custo",
-                    "Itens", "Quantidades", "Justificativa", "Local Entrega",
-                    "Aprovador", "Comprador", "Fornecedores", "Preços Unitários",
-                    "Preços Totais"
-                ])
+            criar_arquivo_local()
+
+def criar_arquivo_local():
+    """Cria um novo arquivo CSV local com estrutura padrão"""
+    with open(LOCAL_FILENAME, mode='w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "ID", "Status", "Data Solicitação", "Solicitante", "Centro Custo",
+            "Itens", "Quantidades", "Justificativa", "Local Entrega",
+            "Aprovador", "Comprador", "Fornecedores", "Preços Unitários",
+            "Preços Totais"
+        ])
 
 def baixar_do_github():
     """Baixa o arquivo do GitHub se estiver mais atualizado"""
@@ -99,22 +108,45 @@ def enviar_para_github():
         return False
 
 def carregar_dados():
-    """Carrega os dados do CSV local"""
+    """Carrega os dados do CSV local com tratamento de erros"""
     try:
-        df = pd.read_csv(LOCAL_FILENAME)
-        return df
+        if os.path.exists(LOCAL_FILENAME) and os.path.getsize(LOCAL_FILENAME) > 0:
+            df = pd.read_csv(LOCAL_FILENAME)
+            
+            # Verifica se todas as colunas necessárias existem
+            colunas_necessarias = [
+                "ID", "Status", "Data Solicitação", "Solicitante", "Centro Custo",
+                "Itens", "Quantidades", "Justificativa", "Local Entrega",
+                "Aprovador", "Comprador", "Fornecedores", "Preços Unitários",
+                "Preços Totais"
+            ]
+            
+            for coluna in colunas_necessarias:
+                if coluna not in df.columns:
+                    df[coluna] = ""
+            
+            return df
+        else:
+            return pd.DataFrame(columns=colunas_necessarias)
     except Exception as e:
         st.error(f"Erro ao ler arquivo local: {str(e)}")
-        return pd.DataFrame(columns=[
-            "ID", "Status", "Data Solicitação", "Solicitante", "Centro Custo",
-            "Itens", "Quantidades", "Justificativa", "Local Entrega",
-            "Aprovador", "Comprador", "Fornecedores", "Preços Unitários",
-            "Preços Totais"
-        ])
+        return pd.DataFrame(columns=colunas_necessarias)
 
 def salvar_dados(df):
     """Salva o DataFrame no arquivo CSV local e no GitHub"""
     try:
+        # Garante que todas as colunas necessárias existam
+        colunas_necessarias = [
+            "ID", "Status", "Data Solicitação", "Solicitante", "Centro Custo",
+            "Itens", "Quantidades", "Justificativa", "Local Entrega",
+            "Aprovador", "Comprador", "Fornecedores", "Preços Unitários",
+            "Preços Totais"
+        ]
+        
+        for coluna in colunas_necessarias:
+            if coluna not in df.columns:
+                df[coluna] = ""
+        
         df.to_csv(LOCAL_FILENAME, index=False)
         
         # Se configurado, envia para o GitHub
@@ -132,7 +164,13 @@ def gerar_id(df):
     
     if not df.empty and 'ID' in df.columns:
         try:
-            ids = [int(row.split('-')[0]) for row in df['ID'] if '-' in row]
+            ids = []
+            for row in df['ID']:
+                if isinstance(row, str) and '-' in row:
+                    try:
+                        ids.append(int(row.split('-')[0]))
+                    except ValueError:
+                        continue
             ultimo_id = max(ids) if ids else 0
         except:
             ultimo_id = 0
@@ -140,7 +178,7 @@ def gerar_id(df):
         ultimo_id = 0
 
     novo_numero = ultimo_id + 1
-    return f"{novo_numero:04d}-{ano_atual}"
+    return f"{novo_numero:04d}-{ano_atval}"
 
 # Páginas do sistema
 def pagina_inicial():
@@ -155,8 +193,8 @@ def pagina_inicial():
     """)
 
     # Mostra status de sincronização com GitHub
-    if GITHUB_REPO:
-        st.info("✅ Sincronização com GitHub ativa")
+    if GITHUB_REPO and GITHUB_FILEPATH and GITHUB_TOKEN:
+        st.success(f"✅ Sincronização ativa com: {GITHUB_REPO}/{GITHUB_FILEPATH}")
     else:
         st.warning("⚠️ Sincronização com GitHub não configurada")
 
@@ -191,7 +229,7 @@ def novo_formulario():
         with col2:
             nova_qtd = st.text_input("Quantidade")
         
-        # Botão para adicionar item (dentro do form mas sem submit)
+        # Botão para adicionar item
         add_item = st.form_submit_button("Adicionar Item")
         
         # Mostrar itens adicionados
@@ -244,8 +282,13 @@ def completar_formulario():
     st.header("📋 Completar Formulário")
     df = carregar_dados()
     
+    # Verifica se a coluna Status existe
+    if 'Status' not in df.columns:
+        st.warning("Nenhum formulário cadastrado ou estrutura inválida")
+        return
+    
     # Filtrar formulários pendentes
-    pendentes = df[df['Status'] == 'Pendente']
+    pendentes = df[df['Status'] == 'Pendente'] if 'Status' in df.columns else pd.DataFrame()
     
     if pendentes.empty:
         st.warning("Nenhum formulário pendente encontrado")
@@ -260,19 +303,19 @@ def completar_formulario():
     
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown(f"**Solicitante:** {form_data['Solicitante']}")
-        st.markdown(f"**Centro de Custo:** {form_data['Centro Custo']}")
-        st.markdown(f"**Local de Entrega:** {form_data['Local Entrega']}")
+        st.markdown(f"**Solicitante:** {form_data.get('Solicitante', '')}")
+        st.markdown(f"**Centro de Custo:** {form_data.get('Centro Custo', '')}")
+        st.markdown(f"**Local de Entrega:** {form_data.get('Local Entrega', '')}")
     with col2:
-        st.markdown(f"**Data de Solicitação:** {form_data['Data Solicitação']}")
-        st.markdown(f"**Aprovador:** {form_data['Aprovador']}")
+        st.markdown(f"**Data de Solicitação:** {form_data.get('Data Solicitação', '')}")
+        st.markdown(f"**Aprovador:** {form_data.get('Aprovador', '')}")
     
-    st.markdown(f"**Justificativa:** {form_data['Justificativa']}")
+    st.markdown(f"**Justificativa:** {form_data.get('Justificativa', '')}")
     
     # Mostrar itens
     st.subheader("Itens Solicitados")
-    itens = form_data['Itens'].split(';')
-    quantidades = form_data['Quantidades'].split(';')
+    itens = form_data.get('Itens', '').split(';') if pd.notna(form_data.get('Itens')) else []
+    quantidades = form_data.get('Quantidades', '').split(';') if pd.notna(form_data.get('Quantidades')) else []
     
     for item, qtd in zip(itens, quantidades):
         st.markdown(f"- {qtd}x {item}")
@@ -293,12 +336,11 @@ def completar_formulario():
         novo_preco_total = st.text_input("Preço Total", disabled=True)
     
     # Botão para adicionar cotação
-    add_cotacao = st.button("Adicionar Cotação")
-    
-    if add_cotacao:
+    if st.button("Adicionar Cotação"):
         if novo_fornecedor and novo_preco_unit:
             try:
-                preco_total = float(novo_preco_unit.replace(",", ".")) * sum([float(q) for q in quantidades])
+                qtd_total = sum([float(q) for q in quantidades if q.replace('.', '').isdigit()])
+                preco_total = float(novo_preco_unit.replace(",", ".")) * qtd_total
                 st.session_state.cotacoes_temp.append((novo_fornecedor, novo_preco_unit, f"{preco_total:.2f}"))
                 st.rerun()
             except ValueError:
@@ -339,14 +381,16 @@ def buscar_formularios():
     st.header("🔍 Buscar Formulários")
     df = carregar_dados()
     
-    if df.empty:
-        st.warning("Nenhum formulário cadastrado")
+    if df.empty or 'Status' not in df.columns:
+        st.warning("Nenhum formulário cadastrado ou estrutura inválida")
         return
     
     with st.expander("Filtros de Busca"):
         col1, col2 = st.columns(2)
         with col1:
-            filtro_status = st.selectbox("Status", ["Todos"] + list(df['Status'].unique()))
+            # Verifica se a coluna Status existe antes de usar
+            status_options = ["Todos"] + list(df['Status'].unique()) if 'Status' in df.columns else ["Todos"]
+            filtro_status = st.selectbox("Status", status_options)
         with col2:
             filtro_solicitante = st.text_input("Solicitante")
     
@@ -354,7 +398,7 @@ def buscar_formularios():
     if filtro_status != "Todos":
         df = df[df['Status'] == filtro_status]
     if filtro_solicitante:
-        df = df[df['Solicitante'].str.contains(filtro_solicitante, case=False)]
+        df = df[df['Solicitante'].str.contains(filtro_solicitante, case=False, na=False)]
     
     st.dataframe(df, use_container_width=True)
 
@@ -364,42 +408,62 @@ def configuracao():
     
     with st.form("github_config"):
         st.subheader("Configuração do GitHub")
-        repo = st.text_input("Repositório (user/repo)", value=GITHUB_REPO or "")
-        filepath = st.text_input("Caminho do arquivo no repositório", value=GITHUB_FILEPATH or "formularios_compras.csv")
-        token = st.text_input("Token de acesso", type="password", value=GITHUB_TOKEN or "")
+        
+        # Mostra configurações atuais
+        st.info(f"Repositório atual: {GITHUB_REPO or 'Não configurado'}")
+        st.info(f"Arquivo atual: {GITHUB_FILEPATH or 'Não configurado'}")
+        
+        # Campos de configuração (apenas token é editável)
+        token = st.text_input("Token de acesso GitHub*", type="password", value=GITHUB_TOKEN or "")
         
         submitted = st.form_submit_button("Salvar Configurações")
         
         if submitted:
-            if repo and filepath and token:
+            if token:
                 try:
-                    # Testar conexão
+                    # Testa o token com as configurações existentes
                     g = Github(token)
-                    g.get_repo(repo).get_contents(filepath)
                     
+                    # Verifica se o repositório e arquivo existem
+                    if GITHUB_REPO and GITHUB_FILEPATH:
+                        try:
+                            repo = g.get_repo(GITHUB_REPO)
+                            repo.get_contents(GITHUB_FILEPATH)
+                        except:
+                            # Se não existir, cria o arquivo
+                            with open(LOCAL_FILENAME, 'r') as f:
+                                content = f.read()
+                            repo.create_file(GITHUB_FILEPATH, "Criação inicial", content)
+                    
+                    # Salva apenas o token (mantém repo e filepath padrão)
                     config = {
-                        'github_repo': repo,
-                        'github_filepath': filepath,
+                        'github_repo': GITHUB_REPO if GITHUB_REPO else DEFAULT_REPO,
+                        'github_filepath': GITHUB_FILEPATH if GITHUB_FILEPATH else DEFAULT_FILEPATH,
                         'github_token': token
                     }
                     
                     with open(CONFIG_FILE, 'w') as f:
                         json.dump(config, f)
                     
-                    # Atualizar variáveis globais
-                    GITHUB_REPO = repo
-                    GITHUB_FILEPATH = filepath
+                    # Atualiza variáveis globais
                     GITHUB_TOKEN = token
+                    if not GITHUB_REPO:
+                        GITHUB_REPO = DEFAULT_REPO
+                    if not GITHUB_FILEPATH:
+                        GITHUB_FILEPATH = DEFAULT_FILEPATH
                     
-                    st.success("Configurações salvas e validadas com sucesso!")
+                    st.success("Token salvo e validado com sucesso!")
                     
-                    # Sincronizar dados
+                    # Tenta sincronizar imediatamente
                     if baixar_do_github():
-                        st.success("Dados sincronizados do GitHub!")
+                        st.success("Dados sincronizados com o GitHub!")
+                    else:
+                        st.warning("Configurações salvas, mas não foi possível sincronizar")
+                        
                 except Exception as e:
-                    st.error(f"Erro ao validar credenciais: {str(e)}")
+                    st.error(f"Token inválido ou sem permissões: {str(e)}")
             else:
-                st.error("Preencha todos os campos para ativar a sincronização")
+                st.error("Informe o token de acesso")
 
 # Menu principal
 def main():
