@@ -202,14 +202,18 @@ def novo_formulario():
     st.header("📝 Novo Formulário de Compra")
     df = carregar_dados()
     
-    with st.form("novo_formulario", clear_on_submit=True):
-        # Gerar ID e data automaticamente
-        form_id = gerar_id(df)
-        data_solicitacao = datetime.now().strftime("%d/%m/%Y %H:%M")
-        
+    # Gerar ID e data automaticamente
+    form_id = gerar_id(df)
+    data_solicitacao = datetime.now().strftime("%d/%m/%Y %H:%M")
+    
+    # Mostrar ID e data no topo (atualizável)
+    col1, col2 = st.columns(2)
+    with col1:
         st.markdown(f"**ID do Formulário:** `{form_id}`")
+    with col2:
         st.markdown(f"**Data de Solicitação:** `{data_solicitacao}`")
-        
+    
+    with st.form("novo_formulario", clear_on_submit=True):
         # Campos do formulário
         nome_solicitante = st.text_input("Nome do Solicitante*")
         centro_custo = st.text_input("Centro de Custo*")
@@ -225,16 +229,24 @@ def novo_formulario():
         
         col1, col2 = st.columns(2)
         with col1:
-            novo_item = st.text_input("Descrição do Item")
+            novo_item = st.text_input("Descrição do Item", key="novo_item")
         with col2:
-            nova_qtd = st.text_input("Quantidade")
+            nova_qtd = st.text_input("Quantidade", key="nova_qtd")
         
         # Botão para adicionar item
         add_item = st.form_submit_button("Adicionar Item")
         
         # Mostrar itens adicionados
         for idx, (item, qtd) in enumerate(st.session_state.itens_temp):
-            st.markdown(f"- {qtd}x {item}")
+            col1, col2, col3 = st.columns([4, 2, 1])
+            with col1:
+                st.markdown(f"- {item}")
+            with col2:
+                st.markdown(f"Quantidade: {qtd}")
+            with col3:
+                if st.button("❌", key=f"del_item_{idx}"):
+                    st.session_state.itens_temp.pop(idx)
+                    st.rerun()
         
         # Botão principal de submit
         submitted = st.form_submit_button("Submeter Formulário")
@@ -287,28 +299,52 @@ def completar_formulario():
         st.warning("Nenhum formulário cadastrado ou estrutura inválida")
         return
     
-    # Filtrar formulários pendentes
-    pendentes = df[df['Status'] == 'Pendente'] if 'Status' in df.columns else pd.DataFrame()
+    # Filtrar formulários pendentes e completos
+    tab1, tab2 = st.tabs(["Formulários Pendentes", "Formulários Completos"])
     
-    if pendentes.empty:
-        st.warning("Nenhum formulário pendente encontrado")
-        return
+    with tab1:
+        st.subheader("Formulários Pendentes")
+        pendentes = df[df['Status'] == 'Pendente'] if 'Status' in df.columns else pd.DataFrame()
+        
+        if pendentes.empty:
+            st.warning("Nenhum formulário pendente encontrado")
+        else:
+            # Selecionar formulário para completar
+            form_id = st.selectbox("Selecione o formulário para completar", pendentes['ID'])
+            form_data = df[df['ID'] == form_id].iloc[0].to_dict()
+            
+            mostrar_detalhes_formulario(form_data, True)
     
-    # Selecionar formulário para completar
-    form_id = st.selectbox("Selecione o formulário para completar", pendentes['ID'])
-    form_data = df[df['ID'] == form_id].iloc[0].to_dict()
-    
+    with tab2:
+        st.subheader("Formulários Completos")
+        completos = df[df['Status'] == 'Completo'] if 'Status' in df.columns else pd.DataFrame()
+        
+        if completos.empty:
+            st.warning("Nenhum formulário completo encontrado")
+        else:
+            # Selecionar formulário para visualizar
+            form_id = st.selectbox("Selecione o formulário para visualizar", completos['ID'])
+            form_data = df[df['ID'] == form_id].iloc[0].to_dict()
+            
+            mostrar_detalhes_formulario(form_data, False)
+
+def mostrar_detalhes_formulario(form_data, editavel):
+    """Mostra os detalhes de um formulário com opção de edição"""
     st.markdown("---")
     st.subheader("Dados do Formulário")
     
     col1, col2 = st.columns(2)
     with col1:
+        st.markdown(f"**ID:** {form_data.get('ID', '')}")
         st.markdown(f"**Solicitante:** {form_data.get('Solicitante', '')}")
         st.markdown(f"**Centro de Custo:** {form_data.get('Centro Custo', '')}")
         st.markdown(f"**Local de Entrega:** {form_data.get('Local Entrega', '')}")
     with col2:
         st.markdown(f"**Data de Solicitação:** {form_data.get('Data Solicitação', '')}")
+        st.markdown(f"**Status:** {form_data.get('Status', '')}")
         st.markdown(f"**Aprovador:** {form_data.get('Aprovador', '')}")
+        if form_data.get('Status') == 'Completo':
+            st.markdown(f"**Comprador:** {form_data.get('Comprador', '')}")
     
     st.markdown(f"**Justificativa:** {form_data.get('Justificativa', '')}")
     
@@ -320,62 +356,89 @@ def completar_formulario():
     for item, qtd in zip(itens, quantidades):
         st.markdown(f"- {qtd}x {item}")
     
-    st.markdown("---")
-    st.subheader("Completar Cotações")
+    if form_data.get('Status') == 'Completo':
+        st.markdown("---")
+        st.subheader("Cotações")
+        
+        fornecedores = form_data.get('Fornecedores', '').split(';') if pd.notna(form_data.get('Fornecedores')) else []
+        precos_unit = form_data.get('Preços Unitários', '').split(';') if pd.notna(form_data.get('Preços Unitários')) else []
+        precos_total = form_data.get('Preços Totais', '').split(';') if pd.notna(form_data.get('Preços Totais')) else []
+        
+        for idx, (fornecedor, unit, total) in enumerate(zip(fornecedores, precos_unit, precos_total)):
+            st.markdown(f"**Cotação {idx+1}:**")
+            st.markdown(f"- Fornecedor: {fornecedor}")
+            st.markdown(f"- Preço Unitário: R$ {unit}")
+            st.markdown(f"- Preço Total: R$ {total}")
     
-    # Seção de cotações
-    if 'cotacoes_temp' not in st.session_state:
-        st.session_state.cotacoes_temp = []
-    
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        novo_fornecedor = st.text_input("Fornecedor")
-    with col2:
-        novo_preco_unit = st.text_input("Preço Unitário")
-    with col3:
-        novo_preco_total = st.text_input("Preço Total", disabled=True)
-    
-    # Botão para adicionar cotação
-    if st.button("Adicionar Cotação"):
-        if novo_fornecedor and novo_preco_unit:
-            try:
-                qtd_total = sum([float(q) for q in quantidades if q.replace('.', '').isdigit()])
-                preco_total = float(novo_preco_unit.replace(",", ".")) * qtd_total
-                st.session_state.cotacoes_temp.append((novo_fornecedor, novo_preco_unit, f"{preco_total:.2f}"))
-                st.rerun()
-            except ValueError:
-                st.error("Digite um valor numérico válido para o preço unitário")
-    
-    # Mostrar cotações adicionadas
-    for idx, (fornecedor, preco_unit, preco_total) in enumerate(st.session_state.cotacoes_temp):
-        st.markdown(f"**Cotação {idx+1}:** {fornecedor} - Unitário: R$ {preco_unit} - Total: R$ {preco_total}")
-    
-    # Campos adicionais
-    nome_comprador = st.text_input("Nome do Comprador*")
-    
-    # Botão para completar formulário
-    if st.button("Completar Formulário"):
-        if not st.session_state.cotacoes_temp:
-            st.error("Adicione pelo menos uma cotação")
-        elif not nome_comprador:
-            st.error("Informe o nome do comprador")
-        else:
-            # Atualizar dados do formulário
-            fornecedores = ";".join([c[0] for c in st.session_state.cotacoes_temp])
-            precos_unit = ";".join([c[1] for c in st.session_state.cotacoes_temp])
-            precos_total = ";".join([c[2] for c in st.session_state.cotacoes_temp])
-            
-            df.loc[df['ID'] == form_id, 'Status'] = 'Completo'
-            df.loc[df['ID'] == form_id, 'Comprador'] = nome_comprador
-            df.loc[df['ID'] == form_id, 'Fornecedores'] = fornecedores
-            df.loc[df['ID'] == form_id, 'Preços Unitários'] = precos_unit
-            df.loc[df['ID'] == form_id, 'Preços Totais'] = precos_total
-            
-            if salvar_dados(df):
-                st.success("Formulário completado com sucesso!")
-                st.session_state.cotacoes_temp = []
-                time.sleep(1)
-                st.rerun()
+    if editavel:
+        st.markdown("---")
+        st.subheader("Completar Cotações")
+        
+        # Seção de cotações
+        if 'cotacoes_temp' not in st.session_state:
+            st.session_state.cotacoes_temp = []
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            novo_fornecedor = st.text_input("Fornecedor")
+        with col2:
+            novo_preco_unit = st.text_input("Preço Unitário")
+        with col3:
+            novo_preco_total = st.text_input("Preço Total", disabled=True)
+        
+        # Botão para adicionar cotação
+        if st.button("Adicionar Cotação"):
+            if novo_fornecedor and novo_preco_unit:
+                try:
+                    qtd_total = sum([float(q) for q in quantidades if q.replace('.', '').isdigit()])
+                    preco_total = float(novo_preco_unit.replace(",", ".")) * qtd_total
+                    st.session_state.cotacoes_temp.append((novo_fornecedor, novo_preco_unit, f"{preco_total:.2f}"))
+                    st.rerun()
+                except ValueError:
+                    st.error("Digite um valor numérico válido para o preço unitário")
+        
+        # Mostrar cotações adicionadas
+        for idx, (fornecedor, preco_unit, preco_total) in enumerate(st.session_state.cotacoes_temp):
+            col1, col2, col3, col4 = st.columns([3, 2, 2, 1])
+            with col1:
+                st.markdown(f"Fornecedor: {fornecedor}")
+            with col2:
+                st.markdown(f"Unitário: R$ {preco_unit}")
+            with col3:
+                st.markdown(f"Total: R$ {preco_total}")
+            with col4:
+                if st.button("❌", key=f"del_cot_{idx}"):
+                    st.session_state.cotacoes_temp.pop(idx)
+                    st.rerun()
+        
+        # Campos adicionais
+        nome_comprador = st.text_input("Nome do Comprador*")
+        
+        # Botão para completar formulário
+        if st.button("Completar Formulário"):
+            if not st.session_state.cotacoes_temp:
+                st.error("Adicione pelo menos uma cotação")
+            elif not nome_comprador:
+                st.error("Informe o nome do comprador")
+            else:
+                # Atualizar dados do formulário
+                df = carregar_dados()
+                
+                fornecedores = ";".join([c[0] for c in st.session_state.cotacoes_temp])
+                precos_unit = ";".join([c[1] for c in st.session_state.cotacoes_temp])
+                precos_total = ";".join([c[2] for c in st.session_state.cotacoes_temp])
+                
+                df.loc[df['ID'] == form_data['ID'], 'Status'] = 'Completo'
+                df.loc[df['ID'] == form_data['ID'], 'Comprador'] = nome_comprador
+                df.loc[df['ID'] == form_data['ID'], 'Fornecedores'] = fornecedores
+                df.loc[df['ID'] == form_data['ID'], 'Preços Unitários'] = precos_unit
+                df.loc[df['ID'] == form_data['ID'], 'Preços Totais'] = precos_total
+                
+                if salvar_dados(df):
+                    st.success("Formulário completado com sucesso!")
+                    st.session_state.cotacoes_temp = []
+                    time.sleep(1)
+                    st.rerun()
 
 def buscar_formularios():
     st.header("🔍 Buscar Formulários")
@@ -388,7 +451,6 @@ def buscar_formularios():
     with st.expander("Filtros de Busca"):
         col1, col2 = st.columns(2)
         with col1:
-            # Verifica se a coluna Status existe antes de usar
             status_options = ["Todos"] + list(df['Status'].unique()) if 'Status' in df.columns else ["Todos"]
             filtro_status = st.selectbox("Status", status_options)
         with col2:
@@ -400,7 +462,33 @@ def buscar_formularios():
     if filtro_solicitante:
         df = df[df['Solicitante'].str.contains(filtro_solicitante, case=False, na=False)]
     
+    # Mostrar tabela com opções de edição/exclusão
     st.dataframe(df, use_container_width=True)
+    
+    # Adicionar opções de edição/exclusão para cada linha
+    if not df.empty:
+        st.subheader("Ações")
+        form_id = st.selectbox("Selecione o formulário para ação", df['ID'])
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("✏️ Editar Formulário"):
+                editar_formulario(form_id)
+        with col2:
+            if st.button("🗑️ Excluir Formulário"):
+                excluir_formulario(form_id)
+
+def editar_formulario(form_id):
+    st.session_state.editando_formulario = form_id
+    st.rerun()
+
+def excluir_formulario(form_id):
+    df = carregar_dados()
+    df = df[df['ID'] != form_id]
+    if salvar_dados(df):
+        st.success(f"Formulário {form_id} excluído com sucesso!")
+        time.sleep(1)
+        st.rerun()
 
 def configuracao():
     st.header("⚙️ Configurações")
