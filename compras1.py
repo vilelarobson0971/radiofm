@@ -6,24 +6,24 @@ st.set_page_config(page_title="Rádio Transamérica", page_icon="🎵")
 def main():
     st.title("🎵 Rádio Transamérica - Player Online by Robson Vilela")
     
-    # URL do streaming de áudio da rádio
+    # URL do streaming
     stream_url = "https://playerservices.streamtheworld.com/api/livestream-redirect/RT_SPAAC.aac"
     
     # Inicializa o estado do player
-    if 'player' not in st.session_state:
-        st.session_state.player = None
+    if 'playing' not in st.session_state:
+        st.session_state.playing = False
     
-    # Layout do player
+    # Player de áudio (sempre visível)
     audio_placeholder = st.empty()
     
-    # Botão único de controle
-    if st.button("▶️ Reproduzir Rádio" if st.session_state.player is None else "⏹️ Parar"):
-        if st.session_state.player is None:
-            st.session_state.player = audio_placeholder.audio(stream_url, format='audio/aac')
+    # Único botão de controle
+    if st.button("▶️ Reproduzir Rádio" if not st.session_state.playing else "⏹️ Parar"):
+        st.session_state.playing = not st.session_state.playing
+        if st.session_state.playing:
+            audio_placeholder.audio(stream_url, format='audio/aac')
             st.success("Rádio em reprodução!")
         else:
             audio_placeholder.empty()
-            st.session_state.player = None
             st.warning("Reprodução parada")
     
     # Rodapé
