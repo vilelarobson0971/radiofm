@@ -1,20 +1,48 @@
 import streamlit as st
 
 # Configuração da página
-st.set_page_config(page_title="Rádio Transamérica", page_icon="🎵")
+st.set_page_config(page_title="Rádio Player Online", page_icon="🎵")
 
 def main():
-    st.title("🎵 Rádio Transamérica - Player Online by Robson Vilela")
+    st.title("🎵 Rádio Player Online by Robson Vilela")
+    st.markdown("---")
     
-    # URL do streaming
-    #stream_url = "https://playerservices.streamtheworld.com/api/livestream-redirect/RT_SPAAC.aac"
-    #stream_url = "https://f111.fabricahost.com.br/paiquere917?f=1743554858N01JQSZFKPJFMB6JE77P46PTYFQ&tid=01JQSZFKPJDWRTRSX0ZXX6NCXY"
-    #stream_url = "http://up-continental.webnow.com.br/cultura.aac?1743555337315"
-    stream_url = "https://antenaone.crossradio.com.br/stream/1;"
+    # Dicionário com as rádios disponíveis
+    radios = {
+        "Rádio Transamérica": {
+            "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/RT_SPAAC.aac",
+            "color": "yellow"
+        },
+        "Rádio Paiquerê": {
+            "url": "https://f111.fabricahost.com.br/paiquere917?f=1743554858N01JQSZFKPJFMB6JE77P46PTYFQ&tid=01JQSZFKPJDWRTRSX0ZXX6NCXY",
+            "color": "orange"
+        },
+        "Rádio Mundo Livre": {
+            "url": "http://up-continental.webnow.com.br/cultura.aac?1743555337315",
+            "color": "green"
+        },
+        "Antena 1": {
+            "url": "https://antenaone.crossradio.com.br/stream/1;",
+            "color": "blue"
+        }
+    }
+    
+    # Seleção da rádio
+    st.subheader("Selecione uma rádio:")
+    radio_selecionada = st.radio(
+        "Opções:",
+        options=list(radios.keys()),
+        horizontal=True,
+        label_visibility="collapsed"
+    )
+    
+    # Exibe o nome da rádio com a cor correspondente
+    cor = radios[radio_selecionada]["color"]
+    st.markdown(f"<h3 style='color:{cor}'>▶ {radio_selecionada}</h3>", unsafe_allow_html=True)
     
     # Player de áudio (inicia automaticamente)
-    st.audio(stream_url, format='audio/aac')
-    st.success("Rádio em reprodução automática!")
+    st.audio(radios[radio_selecionada]["url"], format='audio/aac')
+    st.success(f"Reproduzindo: {radio_selecionada}")
     
     # Rodapé
     st.markdown("---")
