@@ -7,7 +7,8 @@ def main():
     st.title("🎵 Rádio Transamérica - Player Online by Robson Vilela")
     
     # URL do streaming
-    stream_url = "https://playerservices.streamtheworld.com/api/livestream-redirect/RT_SPAAC.aac"
+    #stream_url = "https://playerservices.streamtheworld.com/api/livestream-redirect/RT_SPAAC.aac"
+    stream_url = "https://f111.fabricahost.com.br/paiquere917?f=1743554858N01JQSZFKPJFMB6JE77P46PTYFQ&tid=01JQSZFKPJDWRTRSX0ZXX6NCXY"
     
     # Player de áudio (inicia automaticamente)
     st.audio(stream_url, format='audio/aac')
