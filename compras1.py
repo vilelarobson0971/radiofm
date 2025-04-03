@@ -29,13 +29,19 @@ st.markdown("""
         color: #333333 !important;
     }
     
-    /* Botões visíveis */
+    /* Botões centralizados e visíveis */
+    .stButton {
+        display: flex !important;
+        justify-content: center !important;
+    }
+    
     .stButton>button {
-        width: 100% !important;
+        width: 90% !important;
         padding: 15px !important;
         font-size: 1.1rem !important;
         color: white !important;
         border: none !important;
+        margin: 0 auto !important;
     }
     
     /* Container das rádios */
@@ -59,11 +65,17 @@ st.markdown("""
         font-size: 0.9rem !important;
     }
     
+    /* Centralizando colunas */
+    .stColumns {
+        align-items: center !important;
+    }
+    
     /* Ajustes para mobile */
     @media (max-width: 768px) {
         .stButton>button {
             font-size: 1rem !important;
             padding: 12px !important;
+            width: 95% !important;
         }
         
         .radio-option {
@@ -142,17 +154,32 @@ def main():
     ):
         st.markdown("<h3 style='text-align: center;'>📻 Selecione sua rádio</h3>", unsafe_allow_html=True)
         
+        # Criando 2 colunas centralizadas
         cols = st.columns(2)
         radio_selecionada = None
         
         for i, (name, info) in enumerate(radios.items()):
             with cols[i % 2]:
-                if st.button(
-                    f"{info['icon']} {name}",
-                    key=f"btn_{i}",
-                    help=f"Tocar {name}"
+                # Container estilizado para cada botão
+                with stylable_container(
+                    key=f"btn_container_{i}",
+                    css_styles=f"""
+                        {{
+                            display: flex !important;
+                            justify-content: center !important;
+                            background: linear-gradient(45deg, {info['color']} 0%, #ffffff 100%);
+                            border-radius: 15px;
+                            padding: 5px;
+                            margin-bottom: 10px;
+                        }}
+                    """
                 ):
-                    radio_selecionada = name
+                    if st.button(
+                        f"{info['icon']} {name}",
+                        key=f"btn_{i}",
+                        help=f"Tocar {name}"
+                    ):
+                        radio_selecionada = name
         
         if radio_selecionada:
             with stylable_container(
@@ -172,7 +199,7 @@ def main():
                 st.audio(radios[radio_selecionada]["url"], format='audio/aac', autoplay=True)
                 st.progress(80, text=f"🔊 Conectado à {radio_selecionada}")
     
-    # Rodapé corrigido
+    # Rodapé
     with stylable_container(
         key="footer",
         css_styles="""
