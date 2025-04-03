@@ -10,9 +10,8 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# CSS personalizado com otimizações mobile
+# CSS personalizado com otimizações mobile - AGORA CORRIGIDO
 st.markdown("""
-    <meta name="viewport" content="width=device-width, initial_scale=1.0">
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
     
@@ -75,6 +74,8 @@ st.markdown("""
         }
     }
     </style>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 """, unsafe_allow_html=True)
 
 def main():
