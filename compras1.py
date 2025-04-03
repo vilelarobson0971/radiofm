@@ -95,7 +95,7 @@ def main():
         st.markdown("<h1 style='text-align: center; margin: 0;'>🎧 RÁDIO PLAYER ONLINE</h1>", unsafe_allow_html=True)
         st.markdown("<p style='text-align: center; margin: 0;'>by Robson Vilela | Escolha sua vibe musical!</p>", unsafe_allow_html=True)
     
-    # Dicionário com as rádios disponíveis
+    # Dicionário com as rádios disponíveis (agora com The Cure)
     radios = {
         "Rádio Transamérica": {
             "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/RT_SPAAC.aac",
@@ -121,6 +121,11 @@ def main():
             "url": "https://regiocast.streamabc.net/regc-80s80srock2191507-mp3-192-4255750?sABC=67rr72r0%230%23291on65n9s0149050p2r0013s22q9260%23enqvbqr&aw_0_1st.playerid=radiode&amsparams=playerid:radiode;skey:1743680224",
             "color": "#FF8E53",
             "icon": "🤘"
+        },
+        "The Cure": {
+            "url": "https://2.mystreaming.net/er/thecure/icecast.audio",
+            "color": "#8A2BE2",  # Roxo vibrante
+            "icon": "🦇"  # Ícone de morcego (referência ao visual da banda)
         }
     }
     
@@ -200,7 +205,7 @@ def main():
             }
         """
     ):
-        st.markdown("🎶 Música é vida! | © 2025 Robson Vilela | Atualizado em 2025 🎶", unsafe_allow_html=True)
+        st.markdown("🎶 Música é vida! | © 2023 Robson Vilela | Atualizado em 2023 🎶", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
