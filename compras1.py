@@ -7,8 +7,6 @@ def main():
     st.title("🎵 Rádio Player Online by Robson Vilela")
     st.markdown("---")
 
-
-
     # Dicionário com as rádios disponíveis
     radios = {
         "Rádio Transamérica": {
@@ -26,6 +24,10 @@ def main():
         "Antena 1": {
             "url": "https://antenaone.crossradio.com.br/stream/1;",
             "color": "blue"
+        },
+        "80s80s Rock": {
+            "url": "https://regiocast.streamabc.net/regc-80s80srock2191507-mp3-192-4255750?sABC=67rr72r0%230%23291on65n9s0149050p2r0013s22q9260%23enqvbqr&aw_0_1st.playerid=radiode&amsparams=playerid:radiode;skey:1743680224",
+            "color": "red"
         }
     }
     
