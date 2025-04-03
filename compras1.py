@@ -219,7 +219,7 @@ def main():
                 <p>1. Abra no navegador do celular<br>
                 2. Conecte via Bluetooth ao rádio do carro<br>
                 3. Aproveite sua música!</p>
-                <p>© 2025 Bob Rádios Online</p>
+                <p>© 2025 Desenvolvido por Robson Vilela</p>
             </div>
         """, unsafe_allow_html=True)
 
