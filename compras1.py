@@ -13,8 +13,8 @@ def main():
             "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/RT_SPAAC.aac",
             "color": "yellow"
         },
-        "Rádio Paiquerê": {
-            "url": "https://f111.fabricahost.com.br/paiquere917?f=1743554858N01JQSZFKPJFMB6JE77P46PTYFQ&tid=01JQSZFKPJDWRTRSX0ZXX6NCXY",
+        "Rádio KISS FM": {
+            "url": "https://26593.live.streamtheworld.com/RADIO_KISSFM_ADP_SC",
             "color": "orange"
         },
         "Rádio Mundo Livre": {
