@@ -221,7 +221,7 @@ def main():
             <p>1. Abra este site no seu celular<br>
             2. Conecte o celular ao rádio do carro via Bluetooth<br>
             3. Selecione sua rádio favorita e aproveite!</p>
-            <p>© 2025 Bob Rádios Online | Atualizado em 2025</p>
+            <p>© 2025 Dev. Robson Vilela | Atualizado em 2025</p>
             </div>
         """, unsafe_allow_html=True)
 
