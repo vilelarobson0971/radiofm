@@ -4,7 +4,7 @@ from streamlit_extras.stylable_container import stylable_container
 
 # Configuração da página
 st.set_page_config(
-    page_title="Rádio Player Online",
+    page_title="Bob Rádios Online",
     page_icon="🎧",
     layout="wide",
     initial_sidebar_state="collapsed"
