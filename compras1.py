@@ -92,10 +92,10 @@ def main():
             }
         """
     ):
-        st.markdown("<h1 style='text-align: center; margin: 0;'>🎧 RÁDIO PLAYER ONLINE</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; margin: 0;'>by Robson Vilela | Escolha sua vibe musical!</p>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center; margin: 0;'>🎧 BOB RÁDIOS ONLINE</h1>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; margin: 0;'>Escolha sua vibe musical!</p>", unsafe_allow_html=True)
     
-    # Dicionário com as rádios disponíveis (agora com The Cure)
+    # Dicionário com as rádios disponíveis
     radios = {
         "Rádio Transamérica": {
             "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/RT_SPAAC.aac",
@@ -124,8 +124,8 @@ def main():
         },
         "The Cure": {
             "url": "https://2.mystreaming.net/er/thecure/icecast.audio",
-            "color": "#8A2BE2",  # Roxo vibrante
-            "icon": "🦇"  # Ícone de morcego (referência ao visual da banda)
+            "color": "#8A2BE2",
+            "icon": "🦇"
         }
     }
     
@@ -187,9 +187,6 @@ def main():
                 
                 # Barra de progresso simulada
                 st.progress(70, text="📻 Sintonizando a melhor qualidade...")
-                
-                # Efeitos visuais
-                st.balloons()
     
     # Rodapé
     with stylable_container(
@@ -205,7 +202,7 @@ def main():
             }
         """
     ):
-        st.markdown("🎶 Música é vida! | © 2025 Robson Vilela | Atualizado em 2025 🎶", unsafe_allow_html=True)
+        st.markdown("🎶 Música é vida! | © 2025 Bob Rádios Online | Atualizado em 2025 🎶", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
