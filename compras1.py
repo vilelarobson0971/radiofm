@@ -7,14 +7,12 @@ def main():
     st.title("🎵 Rádio Player Online by Robson Vilela")
     st.markdown("---")
 
-#https://playerservices.streamtheworld.com/api/livestream-redirect/RT_SPAAC.aac
 
 
-    
     # Dicionário com as rádios disponíveis
     radios = {
         "Rádio Transamérica": {
-            "url": "https://regiocast.streamabc.net/regc-80s80srock2191507-mp3-192-4255750?sABC=67rr72r0%230%23291on65n9s0149050p2r0013s22q9260%23enqvbqr&aw_0_1st.playerid=radiode&amsparams=playerid:radiode;skey:1743680224",
+            "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/RT_SPAAC.aac",
             "color": "yellow"
         },
         "Rádio KISS FM": {
