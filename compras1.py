@@ -2,7 +2,7 @@ import streamlit as st
 from streamlit_extras.colored_header import colored_header
 from streamlit_extras.stylable_container import stylable_container
 
-# Configuração da página
+# Configuração da página para mobile
 st.set_page_config(
     page_title="Bob Rádios Online",
     page_icon="🎧",
@@ -10,8 +10,9 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# CSS personalizado
+# CSS personalizado com otimizações mobile
 st.markdown("""
+    <meta name="viewport" content="width=device-width, initial_scale=1.0">
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
     
@@ -21,6 +22,13 @@ st.markdown("""
     
     .main {
         background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    /* Botões maiores para touch */
+    .stButton>button {
+        width: 100% !important;
+        padding: 15px !important;
+        font-size: 1.1rem !important;
     }
     
     .radio-card {
@@ -54,25 +62,17 @@ st.markdown("""
         background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
         color: white;
         border-radius: 10px;
+        font-size: 0.9rem;
     }
     
-    .radio-option {
-        display: inline-block;
-        margin: 5px;
-        padding: 10px 15px;
-        border-radius: 20px;
-        background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%);
-        color: white !important;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
-    
-    .radio-option:hover {
-        transform: scale(1.05);
-    }
-    
-    .radio-option input:checked + label {
-        background: linear-gradient(45deg, #11998e 0%, #38ef7d 100%) !important;
+    @media (max-width: 768px) {
+        /* Ajustes para telas pequenas */
+        .css-1v0mbdj {
+            width: 100% !important;
+        }
+        .stAudio {
+            width: 100% !important;
+        }
     }
     </style>
 """, unsafe_allow_html=True)
@@ -92,22 +92,22 @@ def main():
             }
         """
     ):
-        st.markdown("<h1 style='text-align: center; margin: 0;'>🎧 BOB RÁDIOS ONLINE</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; margin: 0;'>Escolha sua vibe musical!</p>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center; margin: 0; font-size: 2rem;'>🎧 BOB RÁDIOS ONLINE</h1>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; margin: 0; font-size: 1rem;'>Toque sua música favorita no carro ou onde estiver!</p>", unsafe_allow_html=True)
     
     # Dicionário com as rádios disponíveis
     radios = {
-        "Rádio Transamérica": {
+        "Transamérica": {
             "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/RT_SPAAC.aac",
             "color": "#FF9E7D",
             "icon": "🎶"
         },
-        "Rádio KISS FM": {
+        "KISS FM": {
             "url": "https://26593.live.streamtheworld.com/RADIO_KISSFM_ADP_SC",
             "color": "#FF6B6B",
             "icon": "💋"
         },
-        "Rádio Mundo Livre": {
+        "Mundo Livre": {
             "url": "http://up-continental.webnow.com.br/cultura.aac?1743555337315",
             "color": "#4ECDC4",
             "icon": "🌍"
@@ -136,38 +136,43 @@ def main():
             {
                 background-color: white;
                 border-radius: 15px;
-                padding: 25px;
+                padding: 15px;
                 box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                margin-bottom: 20px;
             }
         """
     ):
-        # Seleção da rádio
-        st.subheader("🎚️ Selecione sua rádio preferida:")
+        # Seleção da rádio em colunas responsivas
+        st.markdown("<h3 style='text-align: center;'>📻 Selecione sua rádio</h3>", unsafe_allow_html=True)
         
-        # Usando columns para melhor layout
-        cols = st.columns(len(radios))
+        # Layout responsivo (2 colunas em mobile)
+        col1, col2 = st.columns(2)
+        cols = [col1, col2]
         radio_selecionada = None
         
         for i, (radio_name, radio_info) in enumerate(radios.items()):
-            with cols[i]:
+            with cols[i % 2]:  # Alterna entre as colunas
                 with stylable_container(
                     key=f"radio_{i}",
                     css_styles=f"""
                         {{
                             background: linear-gradient(45deg, {radio_info['color']} 0%, #ffffff 100%);
                             border-radius: 15px;
-                            padding: 10px;
+                            padding: 12px;
                             text-align: center;
                             margin-bottom: 10px;
                         }}
                     """
                 ):
-                    if st.button(f"{radio_info['icon']} {radio_name}"):
+                    if st.button(
+                        f"{radio_info['icon']} {radio_name}",
+                        key=f"btn_{i}",
+                        help=f"Tocar {radio_name}"
+                    ):
                         radio_selecionada = radio_name
         
-        # Se uma rádio foi selecionada
+        # Player de áudio
         if radio_selecionada:
-            # Card da rádio selecionada
             with stylable_container(
                 key="now_playing",
                 css_styles=f"""
@@ -175,20 +180,28 @@ def main():
                         background: linear-gradient(45deg, {radios[radio_selecionada]['color']} 0%, #ffffff 100%);
                         border-radius: 15px;
                         padding: 20px;
-                        margin-top: 20px;
+                        margin-top: 15px;
                         text-align: center;
                     }}
                 """
             ):
-                st.markdown(f"<h2 style='text-align: center; color: white;' class='now-playing'>🎧 TOCANDO AGORA: {radio_selecionada}</h2>", unsafe_allow_html=True)
+                st.markdown(
+                    f"<h3 style='text-align: center; color: white;' class='now-playing'>"
+                    f"▶️ TOCANDO AGORA: {radio_selecionada}</h3>", 
+                    unsafe_allow_html=True
+                )
                 
-                # Player de áudio
-                st.audio(radios[radio_selecionada]["url"], format='audio/aac')
+                # Player otimizado para mobile
+                st.audio(
+                    radios[radio_selecionada]["url"], 
+                    format='audio/aac',
+                    autoplay=True
+                )
                 
-                # Barra de progresso simulada
-                st.progress(70, text="📻 Sintonizando a melhor qualidade...")
+                # Status de conexão
+                st.progress(80, text=f"🔊 Conectado à {radio_selecionada}")
     
-    # Rodapé
+    # Rodapé com instruções para uso no carro
     with stylable_container(
         key="footer",
         css_styles="""
@@ -196,13 +209,20 @@ def main():
                 background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%);
                 border-radius: 10px;
                 padding: 15px;
-                margin-top: 30px;
                 text-align: center;
                 color: white;
             }
         """
     ):
-        st.markdown("🎶 Música é vida! | © 2025 Dev. Robson Vilela | Atualizado em 2025 🎶", unsafe_allow_html=True)
+        st.markdown("""
+            <div style='font-size: 0.9rem;'>
+            <p><strong>Como usar no carro:</strong></p>
+            <p>1. Abra este site no seu celular<br>
+            2. Conecte o celular ao rádio do carro via Bluetooth<br>
+            3. Selecione sua rádio favorita e aproveite!</p>
+            <p>© 2025 Bob Rádios Online | Atualizado em 2025</p>
+            </div>
+        """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
