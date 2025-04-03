@@ -200,7 +200,7 @@ def main():
             }
         """
     ):
-        st.markdown("🎶 Música é vida! | © 2023 Robson Vilela | Atualizado em 2023 🎶", unsafe_allow_html=True)
+        st.markdown("🎶 Música é vida! | © 2025 Robson Vilela | Atualizado em 2025 🎶", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
