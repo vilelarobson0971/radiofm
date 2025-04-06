@@ -136,6 +136,26 @@ def main():
             "url": "https://2.mystreaming.net/er/thecure/icecast.audio",
             "color": "#8A2BE2",
             "icon": "🦇"
+        },
+        "I Love 80s": {
+            "url": "https://live1.livemus.com.br:27400/stream",
+            "color": "#FF69B4",
+            "icon": "❤️"
+        },
+        "Wonder 80s": {
+            "url": "https://80.streeemer.com/listen/80s/radio.aac",
+            "color": "#9370DB",
+            "icon": "✨"
+        },
+        "80s Pop": {
+            "url": "https://oldies.streeemer.com/listen/oldies/radio.aac",
+            "color": "#FFA500",
+            "icon": "🎤"
+        },
+        "80s Alive": {
+            "url": "https://stream.80sa.live/80s-alive.mp3",
+            "color": "#32CD32",
+            "icon": "🌟"
         }
     }
     
