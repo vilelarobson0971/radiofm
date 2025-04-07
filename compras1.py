@@ -10,7 +10,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# CSS personalizado corrigido
+# CSS personalizado com botões 3D
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
@@ -29,21 +29,6 @@ st.markdown("""
         color: #333333 !important;
     }
     
-    /* Botões centralizados e visíveis */
-    .stButton {
-        display: flex !important;
-        justify-content: center !important;
-    }
-    
-    .stButton>button {
-        width: 90% !important;
-        padding: 15px !important;
-        font-size: 1.1rem !important;
-        color: white !important;
-        border: none !important;
-        margin: 0 auto !important;
-    }
-    
     /* Container das rádios */
     .radio-option {
         border-radius: 15px !important;
@@ -52,6 +37,87 @@ st.markdown("""
         text-align: center !important;
         color: white !important;
         font-weight: bold !important;
+        perspective: 500px;
+    }
+    
+    /* Botões 3D - Estilo Base */
+    .stButton {
+        display: flex !important;
+        justify-content: center !important;
+        transform-style: preserve-3d;
+    }
+    
+    .stButton>button {
+        width: 90% !important;
+        padding: 15px !important;
+        font-size: 1.1rem !important;
+        color: white !important;
+        margin: 0 auto !important;
+        border-radius: 12px !important;
+        border: none !important;
+        cursor: pointer !important;
+        position: relative !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 6px 0 rgba(0,0,0,0.2), 
+                    0 5px 10px rgba(0,0,0,0.1),
+                    inset 0 1px 1px rgba(255,255,255,0.3) !important;
+        text-shadow: 0 1px 1px rgba(0,0,0,0.3) !important;
+        transform: translateY(0) !important;
+        font-weight: bold !important;
+    }
+    
+    /* Efeito quando o botão é pressionado */
+    .stButton>button:active {
+        box-shadow: 0 2px 0 rgba(0,0,0,0.2), 
+                    0 1px 2px rgba(0,0,0,0.1),
+                    inset 0 1px 1px rgba(255,255,255,0.3) !important;
+        transform: translateY(4px) !important;
+    }
+    
+    /* Efeito de hover suave */
+    .stButton>button:hover {
+        filter: brightness(1.05) !important;
+    }
+    
+    /* Cores específicas para cada rádio com gradiente 3D */
+    .stButton>button[data-testid="baseButton-secondary"][class*="btn_0"] {
+        background: linear-gradient(145deg, #FF9E7D, #ffb696) !important;
+    }
+    
+    .stButton>button[data-testid="baseButton-secondary"][class*="btn_1"] {
+        background: linear-gradient(145deg, #FF6B6B, #ff8e8e) !important;
+    }
+    
+    .stButton>button[data-testid="baseButton-secondary"][class*="btn_2"] {
+        background: linear-gradient(145deg, #4ECDC4, #88d8d0) !important;
+    }
+    
+    .stButton>button[data-testid="baseButton-secondary"][class*="btn_3"] {
+        background: linear-gradient(145deg, #6A8EAE, #8fa8c5) !important;
+    }
+    
+    .stButton>button[data-testid="baseButton-secondary"][class*="btn_4"] {
+        background: linear-gradient(145deg, #FF8E53, #ffa877) !important;
+    }
+    
+    .stButton>button[data-testid="baseButton-secondary"][class*="btn_5"] {
+        background: linear-gradient(145deg, #8A2BE2, #a155f0) !important;
+    }
+    
+    .stButton>button[data-testid="baseButton-secondary"][class*="btn_6"] {
+        background: linear-gradient(145deg, #FF69B4, #ff8ac5) !important;
+    }
+    
+    .stButton>button[data-testid="baseButton-secondary"][class*="btn_7"] {
+        background: linear-gradient(145deg, #9370DB, #ab8ce6) !important;
+    }
+    
+    .stButton>button[data-testid="baseButton-secondary"][class*="btn_8"] {
+        background: linear-gradient(145deg, #FFA500, #ffb732) !important;
+    }
+    
+    .stButton>button[data-testid="baseButton-secondary"][class*="btn_9"] {
+        background: linear-gradient(145deg, #32CD32, #5ce05c) !important;
     }
     
     /* Rodapé visível */
@@ -187,7 +253,7 @@ def main():
                         {{
                             display: flex !important;
                             justify-content: center !important;
-                            background: linear-gradient(45deg, {info['color']} 0%, #ffffff 100%);
+                            background: transparent !important;
                             border-radius: 15px;
                             padding: 5px;
                             margin-bottom: 10px;
@@ -197,7 +263,8 @@ def main():
                     if st.button(
                         f"{info['icon']} {name}",
                         key=f"btn_{i}",
-                        help=f"Tocar {name}"
+                        help=f"Tocar {name}",
+                        type="secondary"
                     ):
                         radio_selecionada = name
         
@@ -242,6 +309,34 @@ def main():
                 <p>© 2025 Desenvolvido por Robson Vilela</p>
             </div>
         """, unsafe_allow_html=True)
+
+    # Efeito 3D avançado com JavaScript
+    st.markdown("""
+        <script>
+        // Efeito 3D avançado com inclinação ao passar o mouse
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.stButton > button');
+            
+            buttons.forEach(button => {
+                button.addEventListener('mousemove', function(e) {
+                    const x = e.offsetX;
+                    const y = e.offsetY;
+                    const w = this.offsetWidth;
+                    const h = this.offsetHeight;
+                    
+                    const tiltX = (y / h * 10) - 5;
+                    const tiltY = (x / w * -10) + 5;
+                    
+                    this.style.transform = `translateY(0) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+                });
+                
+                button.addEventListener('mouseout', function() {
+                    this.style.transform = 'translateY(0) rotateX(0) rotateY(0)';
+                });
+            });
+        });
+        </script>
+    """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
