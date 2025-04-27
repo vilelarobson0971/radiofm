@@ -219,8 +219,8 @@ def main():
             "color": "#32CD32",
             "icon": "🌟"
         },
-        "The Big 80s Station": {
-            "url": "https://ssl.nexuscast.com:9044/",
+        "Rádio Anos 80": {
+            "url": "https://stream.zeno.fm/3ywickpd3rkvv",
             "color": "#4ECDC4",
             "icon": "🎸"
         },
