@@ -4,8 +4,8 @@ from streamlit_extras.stylable_container import stylable_container
 
 # Configuração da página
 st.set_page_config(
-    page_title="Bob Rádios Online",
-    page_icon="🎧",
+    page_title="Neuros Som",
+    page_icon="🔊",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -21,7 +21,7 @@ st.markdown("""
     
     /* Corrigindo o fundo */
     .main {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important;
     }
     
     /* Títulos sempre visíveis */
@@ -125,7 +125,7 @@ st.markdown("""
         text-align: center !important;
         padding: 15px !important;
         margin-top: 30px !important;
-        background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%) !important;
+        background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%) !important;
         color: white !important;
         border-radius: 10px !important;
         font-size: 0.9rem !important;
@@ -159,7 +159,7 @@ def main():
         key="header",
         css_styles="""
             {
-                background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
+                background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
                 border-radius: 10px;
                 padding: 20px;
                 color: white;
@@ -168,30 +168,15 @@ def main():
             }
         """
     ):
-        st.markdown("<h1 style='text-align: center; margin: 0;'>🎧 BOB RÁDIOS ONLINE</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center; margin: 0;'>🔊 NEUROS SOM</h1>", unsafe_allow_html=True)
         st.markdown("<p style='text-align: center; margin: 0;'>Escolha sua música favorita!</p>", unsafe_allow_html=True)
     
     # Rádios disponíveis
     radios = {
-        "Transamérica": {
-            "url": "https://playerservices.streamtheworld.com/api/livestream-redirect/RT_SPAAC.aac",
-            "color": "#FF9E7D",
-            "icon": "🎶"
-        },
         "KISS FM": {
             "url": "https://26593.live.streamtheworld.com/RADIO_KISSFM_ADP_SC",
             "color": "#FF6B6B",
             "icon": "💋"
-        },
-        "Mundo Livre": {
-            "url": "http://up-continental.webnow.com.br/cultura.aac?1743555337315",
-            "color": "#4ECDC4",
-            "icon": "🌍"
-        },
-        "Antena 1": {
-            "url": "https://antenaone.crossradio.com.br/stream/1;",
-            "color": "#6A8EAE",
-            "icon": "📡"
         },
         "80s80s Rock": {
             "url": "https://regiocast.streamabc.net/regc-80s80srock2191507-mp3-192-4255750?sABC=67rr72r0%230%23291on65n9s0149050p2r0013s22q9260%23enqvbqr&aw_0_1st.playerid=radiode&amsparams=playerid:radiode;skey:1743680224",
@@ -222,6 +207,21 @@ def main():
             "url": "https://stream.80sa.live/80s-alive.mp3",
             "color": "#32CD32",
             "icon": "🌟"
+        },
+        "The Big 80s Station": {
+            "url": "https://ssl.nexuscast.com:9044/",
+            "color": "#4ECDC4",
+            "icon": "🎸"
+        },
+        "Its 80s": {
+            "url": "https://securestream.cuelightsmedia.com.au/listen/80s/low.aac",
+            "color": "#6A8EAE",
+            "icon": "📻"
+        },
+        "80s90s Hits": {
+            "url": "https://live.streamthe.world/80s90s-hits",
+            "color": "#8A2BE2",
+            "icon": "🎵"
         }
     }
     
@@ -291,7 +291,7 @@ def main():
         key="footer",
         css_styles="""
             {
-                background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%);
+                background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
                 border-radius: 10px;
                 padding: 15px;
                 text-align: center;
