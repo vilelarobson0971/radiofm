@@ -136,6 +136,11 @@ st.markdown("""
         align-items: center !important;
     }
     
+    /* Estilo específico para o título principal */
+    .css-10trblm {
+        color: #FFFF00 !important;
+    }
+    
     /* Ajustes para mobile */
     @media (max-width: 768px) {
         .stButton>button {
@@ -168,7 +173,7 @@ def main():
             }
         """
     ):
-        st.markdown("<h1 style='text-align: center; margin: 0; color: #FFFF00;'>🔊 NEUROS SOM</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center; margin: 0; color: #FFFF00 !important;'>🔊 NEUROS SOM</h1>", unsafe_allow_html=True)
         st.markdown("<p style='text-align: center; margin: 0;'>Escolha sua música favorita!</p>", unsafe_allow_html=True)
     
     # Rádios disponíveis
