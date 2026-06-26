@@ -310,8 +310,19 @@ def render_header():
         """, unsafe_allow_html=True)
 
 
+def _select_radio(name):
+    """Callback executado ANTES do rerun do script.
+
+    Usar on_click garante que st.session_state['current_radio'] já
+    esteja atualizado quando o script reprocessa e desenha os cartões
+    — por isso o badge 'NO AR' aparece já no primeiro clique, sem
+    precisar de um segundo clique para 'alcançar' o estado.
+    """
+    st.session_state["current_radio"] = name
+
+
 def render_radio_buttons(radios):
-    """Renderiza as rádios como cartões e retorna a selecionada."""
+    """Renderiza as rádios como cartões."""
     st.markdown(
         "<h3 style='text-align:center; font-size:1.15rem; opacity:0.9; margin-bottom:16px;'>"
         "📻 Selecione sua rádio</h3>",
@@ -319,7 +330,6 @@ def render_radio_buttons(radios):
     )
 
     cols = st.columns(2, gap="medium")
-    radio_selecionada = None
 
     for i, (name, info) in enumerate(radios.items()):
         with cols[i % 2]:
@@ -352,11 +362,13 @@ def render_radio_buttons(radios):
                 """, unsafe_allow_html=True)
 
                 label = "⏸️ Tocando agora" if is_playing else "▶️ Ouvir agora"
-                if st.button(label, key=f"btn_{i}", use_container_width=True):
-                    radio_selecionada = name
-                    st.session_state["current_radio"] = name
-
-    return radio_selecionada
+                st.button(
+                    label,
+                    key=f"btn_{i}",
+                    use_container_width=True,
+                    on_click=_select_radio,
+                    args=(name,),
+                )
 
 
 def render_player(radio_name, radio_info):
@@ -455,8 +467,8 @@ def main():
             }
         """
     ):
-        radio_selecionada = render_radio_buttons(radios)
-        radio_atual = radio_selecionada or st.session_state.get("current_radio")
+        render_radio_buttons(radios)
+        radio_atual = st.session_state.get("current_radio")
 
         if radio_atual and radio_atual in radios:
             render_player(radio_atual, radios[radio_atual])
