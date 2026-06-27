@@ -170,6 +170,37 @@ st.markdown("""
         margin-top: 4px;
     }
 
+    /* Botão "forçar play" — HTML puro, clique síncrono no navegador,
+       não passa pelo rerun do Streamlit, por isso consegue iniciar
+       o áudio mesmo quando o autoplay foi bloqueado. */
+    .neuros-play-btn {
+        width: 100%;
+        padding: 10px 16px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        color: white;
+        border-radius: 999px;
+        border: 1px solid rgba(255,255,255,0.18);
+        cursor: pointer;
+        background: rgba(255,255,255,0.06);
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+        font-family: 'Montserrat', sans-serif;
+        display: block;
+        text-align: center;
+    }
+    .neuros-play-btn:hover {
+        background: rgba(255,255,255,0.16);
+        border-color: rgba(255,255,255,0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+    }
+    .neuros-play-btn:active {
+        transform: translateY(0);
+        filter: brightness(0.95);
+    }
+
     .autoplay-hint {
         font-size: 0.78rem;
         color: rgba(255,255,255,0.6);
@@ -361,14 +392,25 @@ def render_radio_buttons(radios):
                     </div>
                 """, unsafe_allow_html=True)
 
-                label = "⏸️ Tocando agora" if is_playing else "▶️ Ouvir agora"
-                st.button(
-                    label,
-                    key=f"btn_{i}",
-                    use_container_width=True,
-                    on_click=_select_radio,
-                    args=(name,),
-                )
+                if is_playing:
+                    # Botão HTML puro: o clique aqui é um gesto síncrono
+                    # real no navegador, então consegue dar play no
+                    # <audio> já existente mesmo se o autoplay foi
+                    # bloqueado — sem precisar de um rerun do Streamlit.
+                    st.markdown("""
+                        <button class="neuros-play-btn" onclick="
+                            var a = document.querySelector('audio');
+                            if (a) { a.play().catch(function(){}); }
+                        ">⏸️ Tocando agora (toque para retomar)</button>
+                    """, unsafe_allow_html=True)
+                else:
+                    st.button(
+                        "▶️ Ouvir agora",
+                        key=f"btn_{i}",
+                        use_container_width=True,
+                        on_click=_select_radio,
+                        args=(name,),
+                    )
 
 
 def render_player(radio_name, radio_info):
@@ -405,7 +447,8 @@ def render_player(radio_name, radio_info):
         st.progress(100, text=f"🔊 Conectado à {radio_name}")
         st.markdown(
             "<p class='autoplay-hint'>Se o som não iniciar automaticamente "
-            "(alguns navegadores bloqueiam autoplay), toque no ▶️ do player acima.</p>",
+            "(alguns navegadores bloqueiam autoplay), toque no cartão desta rádio "
+            "em \"Tocando agora\" acima para retomar.</p>",
             unsafe_allow_html=True
         )
 
