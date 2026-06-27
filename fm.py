@@ -397,7 +397,7 @@ def render_radio_buttons(radios):
                             }}
                         </style>
                         <button id="neurosPlayBtn_{i}" class="neuros-play-btn">
-                            ⏸️ Tocando agora (toque para retomar)
+                            ⏸️ Tocando agora
                         </button>
                         <script>
                             (function() {{
