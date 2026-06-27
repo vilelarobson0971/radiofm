@@ -6,7 +6,7 @@ from streamlit_extras.stylable_container import stylable_container
 # Configuração da página
 # ============================================================
 st.set_page_config(
-    page_title="Neuros Som",
+    page_title="Neuros Som 80s Music",
     page_icon="🔊",
     layout="wide",
     initial_sidebar_state="collapsed"
