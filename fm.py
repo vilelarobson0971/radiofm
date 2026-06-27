@@ -6,7 +6,7 @@ from streamlit_extras.stylable_container import stylable_container
 # Configuração da página
 # ============================================================
 st.set_page_config(
-    page_title="Neuros Som 80s Music",
+    page_title="Neuros Som",
     page_icon="🔊",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -305,7 +305,7 @@ def render_header():
     ):
         st.markdown("""
             <div class="neuros-title">
-                <h1>🔊 NEUROS SOM</h1>
+                <h1>🔊 NEUROS SOM 80s MUSIC</h1>
             </div>
             <p class="neuros-subtitle">🎧 Escolha sua Rádio Favorita e Aproveite</p>
         """, unsafe_allow_html=True)
@@ -501,7 +501,7 @@ def render_footer():
                     💡 <strong>Dica:</strong> Adicione à tela inicial para acesso rápido!
                 </p>
                 <p style="margin-top:14px; font-size:0.78rem; opacity:0.6;">
-                    © 2025 Desenvolvido com ❤️ por <strong>Robson Vilela</strong>
+                    © 2025 Desenvolvido com por <strong>Robson Vilela</strong>
                 </p>
             </div>
         """, unsafe_allow_html=True)
