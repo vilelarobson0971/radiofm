@@ -501,7 +501,7 @@ def render_footer():
                     💡 <strong>Dica:</strong> Adicione à tela inicial para acesso rápido!
                 </p>
                 <p style="margin-top:14px; font-size:0.78rem; opacity:0.6;">
-                    © 2025 Desenvolvido com por <strong>Robson Vilela</strong>
+                    © 2025 Desenvolvido por <strong>Robson Vilela</strong>
                 </p>
             </div>
         """, unsafe_allow_html=True)
