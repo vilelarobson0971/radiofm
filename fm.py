@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 from streamlit_extras.stylable_container import stylable_container
 
 # ============================================================
@@ -168,37 +169,6 @@ st.markdown("""
         border-radius: 12px;
         box-shadow: 0 6px 20px rgba(0,0,0,0.35);
         margin-top: 4px;
-    }
-
-    /* Botão "forçar play" — HTML puro, clique síncrono no navegador,
-       não passa pelo rerun do Streamlit, por isso consegue iniciar
-       o áudio mesmo quando o autoplay foi bloqueado. */
-    .neuros-play-btn {
-        width: 100%;
-        padding: 10px 16px;
-        font-size: 0.95rem;
-        font-weight: 700;
-        letter-spacing: 0.3px;
-        color: white;
-        border-radius: 999px;
-        border: 1px solid rgba(255,255,255,0.18);
-        cursor: pointer;
-        background: rgba(255,255,255,0.06);
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-        font-family: 'Montserrat', sans-serif;
-        display: block;
-        text-align: center;
-    }
-    .neuros-play-btn:hover {
-        background: rgba(255,255,255,0.16);
-        border-color: rgba(255,255,255,0.4);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.35);
-    }
-    .neuros-play-btn:active {
-        transform: translateY(0);
-        filter: brightness(0.95);
     }
 
     .autoplay-hint {
@@ -393,16 +363,63 @@ def render_radio_buttons(radios):
                 """, unsafe_allow_html=True)
 
                 if is_playing:
-                    # Botão HTML puro: o clique aqui é um gesto síncrono
-                    # real no navegador, então consegue dar play no
-                    # <audio> já existente mesmo se o autoplay foi
-                    # bloqueado — sem precisar de um rerun do Streamlit.
-                    st.markdown("""
-                        <button class="neuros-play-btn" onclick="
-                            var a = document.querySelector('audio');
-                            if (a) { a.play().catch(function(){}); }
-                        ">⏸️ Tocando agora (toque para retomar)</button>
-                    """, unsafe_allow_html=True)
+                    # components.html garante execução real de JS (st.markdown
+                    # não executa <script> e nem sempre preserva onclick de
+                    # forma confiável). O botão vive num iframe, então
+                    # acessamos o documento pai via window.parent.document
+                    # para encontrar e dar play no <audio> real da página —
+                    # isso conta como gesto de clique síncrono e válido.
+                    components.html(f"""
+                        <style>
+                            html, body {{ margin:0; padding:0; background:transparent; }}
+                            .neuros-play-btn {{
+                                width:100%;
+                                box-sizing:border-box;
+                                padding:10px 16px;
+                                font-size:0.95rem;
+                                font-weight:700;
+                                letter-spacing:0.3px;
+                                color:white;
+                                border-radius:999px;
+                                border:1px solid rgba(255,255,255,0.18);
+                                cursor:pointer;
+                                background:rgba(255,255,255,0.06);
+                                box-shadow:0 4px 14px rgba(0,0,0,0.25);
+                                font-family:'Montserrat',sans-serif;
+                                transition: all 0.2s ease;
+                            }}
+                            .neuros-play-btn:hover {{
+                                background:rgba(255,255,255,0.16);
+                                border-color:rgba(255,255,255,0.4);
+                            }}
+                            .neuros-play-btn:active {{
+                                filter:brightness(0.9);
+                            }}
+                        </style>
+                        <button id="neurosPlayBtn_{i}" class="neuros-play-btn">
+                            ⏸️ Tocando agora (toque para retomar)
+                        </button>
+                        <script>
+                            (function() {{
+                                var btn = document.getElementById("neurosPlayBtn_{i}");
+                                if (btn) {{
+                                    btn.addEventListener("click", function() {{
+                                        try {{
+                                            var pdoc = window.parent.document;
+                                            var audio = pdoc.querySelector("audio");
+                                            if (audio) {{
+                                                audio.play().catch(function(err) {{
+                                                    console.log("Neuros Som: play bloqueado", err);
+                                                }});
+                                            }}
+                                        }} catch (e) {{
+                                            console.log("Neuros Som: erro ao acessar audio", e);
+                                        }}
+                                    }});
+                                }}
+                            }})();
+                        </script>
+                    """, height=52)
                 else:
                     st.button(
                         "▶️ Ouvir agora",
@@ -521,3 +538,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
