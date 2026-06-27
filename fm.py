@@ -307,7 +307,7 @@ def render_header():
             <div class="neuros-title">
                 <h1>🔊 NEUROS SOM</h1>
             </div>
-            <p class="neuros-subtitle">🎧 Escolha sua rádio favorita e aproveite, sem complicação</p>
+            <p class="neuros-subtitle">🎧 Escolha sua Rádio Favorita e Aproveite</p>
         """, unsafe_allow_html=True)
 
 
